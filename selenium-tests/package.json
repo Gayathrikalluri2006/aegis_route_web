@@ -1,0 +1,15 @@
+{
+  "name": "selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium end-to-end tests for Aegis Route",
+  "main": "tests/login.test.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha tests/**/*.test.js --timeout 15000"
+  },
+  "devDependencies": {
+    "chromedriver": "^131.0.0",
+    "mocha": "^11.0.1",
+    "selenium-webdriver": "^4.27.0"
+  }
+}

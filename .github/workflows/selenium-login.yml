@@ -1,0 +1,53 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci || npm install
+
+      - name: Install Test Dependencies
+        run: |
+          cd selenium-tests
+          npm ci || npm install
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Start Local Server
+        run: npm run dev &
+        env:
+          PORT: 8080
+
+      - name: Wait for Local Server to be Ready
+        run: npx wait-on http://localhost:8080 --timeout 60000
+
+      - name: Run Selenium E2E Tests
+        run: |
+          cd selenium-tests
+          npm test
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/client
+          publish_branch: gh-pages
